@@ -1,12 +1,15 @@
 const noble = require('noble');
 const { EventEmitter } = require('events');
+const axios = require('axios');
+const url = 'http://192.168.0.109:8123/api/events';
 
 
 !function main() {
   const devices = [];
   const events = new EventEmitter();
 
-  let state = 'on';
+  let shortState = true;
+  let longState = false;
 
   noble.on('discover', device => discover(device, events));
 
@@ -25,10 +28,18 @@ const { EventEmitter } = require('events');
     console.log(`connected to device ${peripheral.advertisement.localName}: ${peripheral.uuid}`);
   });
 
-  events.on('Button Pressed', e => {
+  events.on('Button Pressed Short', e => {
     console.log('Button Pressed -', e.device.advertisement.localName);
-    toggleLEDs(devices, state);
-    state = state === 'on' ? 'off' : 'on';
+    axios.post(`${url}/${e.data}`);
+    toggleLEDs(devices, shortState);
+    shortState = !shortState;
+  });
+
+  events.on('Button Pressed Long', e => {
+    console.log('Button Pressed -', e.device.advertisement.localName);
+    axios.post(`${url}/${e.data}`);
+    toggleLEDs(devices, longState);
+    longState = !longState;
   });
 
 }();
@@ -37,7 +48,7 @@ function toggleLEDs(devices, state) {
 
   for(const device of devices) {
     const c = device.characteristics.find(x => x.uuid === '6e400002b5a3f393e0a9e50e24dcca9e');
-    c.write(Buffer.from(`setLED(${state === 'on' ? '1' : '2'});\n`));
+    c.write(Buffer.from(`setLED(${state === true ? '1' : '2'});\n`));
   }
 
 
@@ -65,9 +76,11 @@ function subscribeToCharacteristics(device, eventEmitter) {
         if(readData) {
           const data = readData.toString();
           
-          if(data.includes('button_pressed'))
-            eventEmitter.emit('Button Pressed', { data: readData, device });
+          if(data.includes('button_pressed_s'))
+            eventEmitter.emit('Button Pressed Short', { data: 'button_pressed_short', device });
           
+          else if(data.includes('button_pressed_l'))
+            eventEmitter.emit('Button Pressed Long', { data: 'button_pressed_long', device });
         }
       });
     })

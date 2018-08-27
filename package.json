@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "noble": "^1.9.1",
     "xpc-connection": "sandeepmistry/node-xpc-connection#pull/26/head"
   },
