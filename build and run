@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+docker build -t lightswitch . \
+  && docker run --network host -it --privileged lightswitch

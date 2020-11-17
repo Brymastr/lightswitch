@@ -1,0 +1,26 @@
+version: "3"
+services:
+  webthings:
+    # image: "mozillaiot/gateway:arm"
+    image: "mozillaiot/gateway:latest"
+    command: --net=host --privileged
+    container_name: mozilla-iot-gateway
+    ports:
+      - "8080:8080"
+      - "4443:4443"
+    volumes:
+      - webthings:/home/node/.mozilla-iot
+
+  lightswitch:
+    build: ./
+    command: --net=host --privileged
+    ports:
+      - "9000:80"
+    
+
+volumes: 
+  webthings:
+
+networks:
+  shared:
+  

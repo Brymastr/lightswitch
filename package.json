@@ -15,9 +15,6 @@
     "bleno": "^0.5.0",
     "noble": "^1.9.1",
     "uuid": "^3.3.2",
-    "xpc-connection": "sandeepmistry/node-xpc-connection#pull/26/head"
-  },
-  "resolutions": {
-    "xpc-connection": "sandeepmistry/node-xpc-connection#pull/26/head"
+    "webthing": "^0.11.0"
   }
 }
