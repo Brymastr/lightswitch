@@ -57,7 +57,7 @@ async function getServiceData(device: Device) {
   return data;
 }
 
-async function handleUpdate(serviceData: ServiceData, light: LightControl) {
+async function handleUpdate(serviceData: ServiceData, light?: LightControl) {
   const { mac } = serviceData;
   const existing = PUCKS[mac];
 
@@ -69,20 +69,20 @@ async function handleUpdate(serviceData: ServiceData, light: LightControl) {
   if (shortPress) {
     console.log('short press', serviceData.shortPresses);
     existing.short = serviceData.shortPresses;
-    light.flash(GREEN_ACKNOWLEDGE);
+    light?.flash(GREEN_ACKNOWLEDGE);
   }
 
   if (longPress) {
     console.log('long press', serviceData.longPresses);
     existing.long = serviceData.longPresses;
-    light.flash(BLUE_ACKNOWLEDGE);
+    light?.flash(BLUE_ACKNOWLEDGE);
   }
 }
 
 async function main() {
   const bluetooth = new Bluez();
   const light = new LightControl();
-
+  let d1 = Date.now();
   bluetooth.on('device', async (address, props) => {
     if (!props.Name?.includes('Puck.js')) return;
 
@@ -90,6 +90,10 @@ async function main() {
 
     device.on('PropertiesChanged', async () => {
       const serviceData = await getServiceData(device);
+      const d2 = Date.now();
+      console.log((d2 - d1) / 1000);
+      d1 = d2;
+
       handleUpdate(serviceData, light);
     });
   });
